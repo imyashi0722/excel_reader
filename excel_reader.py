@@ -1,20 +1,33 @@
-import os
+﻿import os
+import json
 import pyexcel
-from pyexcel.ext import xlsx
+
+def main_runner(path):
+    if type(path) == str:
+        if path.endswith(".xlsx"):
+            excel_reader_main.main(path=path)
+        elif path.endswith(".xls"):
+            print("this is a .xls\n    converting and processing....")
+            new_path = (os.path.dirname(os.path.abspath(path))) + 'Book1_recreated.xlsx'
+            pyexcel.save_book_as(file_name=path, dest_file_name=new_path)
+            excel_reader_main.main(path=new_path)
 
 class excel_reader_main():
     def main(path):
         return excel_reader_main.format_check(path) 
 
     def format_check(path):
-        if path.endswith('xls') or path.endswith('xlsm') or path.endswith('xlsx'):
-            name = 'Test2.csv'
-            folder_path = file_name=os.path.dirname(path)
-            pyexcel.save_as(folder_path, dest_file_name=folder_path+name)
-            return 'saved as {0}'.format(name)
-        else: return 'Unsupported format'
+        if path.endswith('xlsx'):
+            try:
+                my_dict = pyexcel.get_dict(file_name=path)
+                from pyexcel._compact import OrderedDict
+                isinstance(my_dict, OrderedDict)
+                for key, values in my_dict.items():
+                    print(key + " : " + ','.join([str(item) for item in values]))
+            except: print('The file is empty.')
+        else: return 'Unsupported format.\n  use ".xls" or "xlsm" or "xlsx"'
 
-path = r'D:/Yashu/Projects/Python/excel_reader/Book.xlsx'
+xlsx_path = r'C:\Users\renuk\OneDrive\Documents\Book.xlsx'
+xls_path = r'C:\Users\renuk\OneDrive\Documents\Book1.xls'
 
-if type(path) == str:
-    print(excel_reader_main.main(path=path))
+main_runner(xlsx_path)
